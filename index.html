@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Crash Pro TON</title>
+    <title>Crash Pro X</title>
     <style>
       * {
         box-sizing: border-box;
@@ -26,7 +26,6 @@
         flex-direction: column;
         height: 100dvh;
         overflow: hidden;
-        align-items: center;
       }
       .status-box {
         display: flex;
@@ -91,7 +90,6 @@
         flex-direction: column;
         gap: 10px;
         align-items: center;
-        width: 100%;
       }
       input {
         padding: 16px;
@@ -151,6 +149,7 @@
         flex: 1;
       }
       .explosion {
+        position: absolute;
         font-size: 80px;
         pointer-events: none;
         opacity: 0;
@@ -176,7 +175,7 @@
     <div class="status-box">
       <div class="status-item">👥 Онлайн: <span id="online">96</span></div>
       <div class="status-item balance-container">
-        <span id="balance">100 TON</span>
+        <span id="balance">100</span>💎
         <button id="addBalance">+</button>
       </div>
     </div>
@@ -207,7 +206,6 @@
         playerCashOut = false,
         historyArr = [];
 
-      // Онлайн
       function updateOnline() {
         let online = document.getElementById("online");
         let current = parseInt(online.innerText);
@@ -217,13 +215,10 @@
       }
       setInterval(updateOnline, 2000);
 
-      // Баланс
       function updateBalance() {
-        document.getElementById("balance").innerText =
-          balance.toFixed(2) + " TON";
+        document.getElementById("balance").innerText = balance.toFixed(0);
       }
 
-      // История
       function addHistory(x) {
         historyArr.unshift(x.toFixed(2));
         if (historyArr.length > 15) historyArr.pop();
@@ -237,7 +232,6 @@
         });
       }
 
-      // Отсчёт
       function startCountdown() {
         document.getElementById("rocket").style.display = "none";
         document.getElementById("multiplier").innerText = "";
@@ -256,19 +250,19 @@
         }, 1000);
       }
 
-      // Система коэффициентов
+      // Новая система коэффициентов
       function randomCrash() {
         let rand = Math.random();
-        if (rand < 0.35) {
-          // 35% — маленькие
-          const small = [1.2, 1.5, 1.8];
+        if (rand < 0.3) {
+          // 30% маленькие
+          const small = [1.0, 1.2, 1.5, 1.8];
           return small[Math.floor(Math.random() * small.length)];
-        } else if (rand < 0.8) {
-          // 45% — средние
+        } else if (rand < 0.85) {
+          // 55% средние
           return +(Math.random() * 8 + 2).toFixed(2); // 2-10x
         } else {
-          // 20% — большие
-          const big = [20, 50, 80, 100];
+          // 15% большие
+          const big = [15, 20, 28];
           return big[Math.floor(Math.random() * big.length)];
         }
       }
@@ -307,12 +301,10 @@
 
       function createExplosion() {
         const rocket = document.getElementById("rocket");
-        const rect = rocket.getBoundingClientRect();
         const explosion = document.createElement("div");
         explosion.className = "explosion";
-        explosion.style.position = "fixed";
-        explosion.style.left = rect.left + rect.width / 2 - 40 + "px";
-        explosion.style.top = rect.top + rect.height / 2 - 40 + "px";
+        explosion.style.left = rocket.offsetLeft + "px";
+        explosion.style.top = rocket.offsetTop + "px";
         explosion.innerText = "💥";
         document.body.appendChild(explosion);
         setTimeout(() => explosion.remove(), 600);
@@ -331,7 +323,7 @@
 
       function placeBet() {
         if (gameRunning) return;
-        const amount = parseFloat(document.getElementById("betInput").value);
+        const amount = parseInt(document.getElementById("betInput").value);
         if (!amount || amount <= 0 || amount > balance) return;
         bet = amount;
         balance -= amount;
@@ -342,7 +334,7 @@
 
       function cashOut() {
         if (!gameRunning || bet <= 0 || playerCashOut) return;
-        const win = bet * multiplier;
+        const win = Math.floor(bet * multiplier);
         balance += win;
         updateBalance();
         addHistory(multiplier);
@@ -361,7 +353,7 @@
         else placeBet();
       };
 
-      // Пополнение баланса
+      // Пополнение баланса по кнопке +
       document.getElementById("addBalance").onclick = () => {
         balance += 50;
         updateBalance();

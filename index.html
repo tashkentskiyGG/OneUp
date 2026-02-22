@@ -4,16 +4,9 @@
     <meta charset="UTF-8" />
     <meta
       name="viewport"
-      content="width=device-width,
-initial-scale=1.0,
-maximum-scale=1.0,
-user-scalable=no,
-viewport-fit=cover"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
     />
-
-    <title>Crash Pro</title>
-
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <title>Crash Pro X</title>
 
     <style>
       * {
@@ -22,161 +15,103 @@ viewport-fit=cover"
         padding: 0;
         -webkit-tap-highlight-color: transparent;
       }
-
       :root {
-        --tg-bg: #0f1c2e;
-        --tg-secondary: #1e293b;
-        --tg-accent: #2563eb;
+        --bg: #0f172a;
+        --card: #1e293b;
+        --accent: #2563eb;
+        --green: #22c55e;
+        --red: #ef4444;
+        --yellow: #facc15;
       }
-
       body {
         font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-        background: var(--tg-bg);
+        background: var(--bg);
         color: white;
         display: flex;
         flex-direction: column;
         height: 100dvh;
-        padding-bottom: env(safe-area-inset-bottom);
         overflow: hidden;
       }
-
-      /* HEADER */
-      .header {
+      .balance-box {
+        background: linear-gradient(135deg, #1e293b, #0f172a);
+        padding: 10px 14px;
+        font-weight: 700;
+        font-size: 14px;
         display: flex;
         justify-content: space-between;
-        padding: 16px;
-        background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(15px);
+        align-items: center;
       }
-
-      .logo {
-        font-weight: 700;
-        font-size: 16px;
-      }
-
-      .balance {
-        background: var(--tg-secondary);
-        padding: 8px 16px;
-        border-radius: 20px;
-        font-weight: 700;
-        color: #22c55e;
-      }
-
-      /* HISTORY */
       .history {
         display: flex;
         gap: 6px;
-        padding: 10px;
+        padding: 8px;
         overflow-x: auto;
-        scrollbar-width: none;
       }
-      .history::-webkit-scrollbar {
-        display: none;
-      }
-
       .history span {
-        padding: 6px 10px;
-        border-radius: 8px;
-        font-size: 13px;
-        background: var(--tg-secondary);
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 12px;
+        background: var(--card);
         white-space: nowrap;
       }
-
-      /* GAME */
       .game {
         flex: 1;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        gap: 20px;
+        gap: 10px;
         position: relative;
       }
-
       #multiplier {
-        font-size: 52px;
-        font-weight: 800;
+        font-size: clamp(42px, 10vw, 72px);
+        font-weight: 900;
       }
-
-      .green {
-        color: #22c55e;
-      }
-      .yellow {
-        color: #facc15;
-      }
-      .red {
-        color: #ef4444;
-      }
-
       #rocket {
-        font-size: 56px;
+        font-size: clamp(40px, 8vw, 70px);
         transition: transform 0.05s linear;
       }
-
       .countdown {
         position: absolute;
         bottom: 20px;
-        font-size: 14px;
-        color: #facc15;
+        font-size: 16px;
+        color: var(--yellow);
       }
-
-      /* CONTROLS */
       .controls {
-        padding: 16px;
-        background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(15px);
+        padding: 15px;
         display: flex;
         flex-direction: column;
-        gap: 12px;
+        gap: 10px;
       }
-
       input {
         padding: 16px;
         border-radius: 14px;
         border: none;
-        font-size: 16px;
-        background: var(--tg-secondary);
+        background: var(--card);
         color: white;
         text-align: center;
+        font-size: 18px;
       }
-
-      .buttons {
-        display: flex;
-        gap: 10px;
-      }
-
-      button {
-        flex: 1;
-        padding: 16px;
+      .main-btn {
+        padding: 20px;
         border: none;
-        border-radius: 14px;
-        font-weight: 700;
-        font-size: 15px;
-        cursor: pointer;
-        transition: 0.1s;
-      }
-
-      .bet-btn {
-        background: var(--tg-accent);
+        border-radius: 16px;
+        font-weight: 900;
+        font-size: 20px;
+        background: var(--accent);
         color: white;
       }
-      .cash-btn {
-        background: #22c55e;
+      .main-btn.green {
+        background: var(--green);
         color: black;
-      }
-
-      button:active {
-        transform: scale(0.96);
-      }
-      button:disabled {
-        opacity: 0.5;
       }
     </style>
   </head>
+
   <body>
-    <div class="header">
-      <div class="logo">🚀 CRASH PRO</div>
-      <div class="balance">💎 <span id="balance">100</span></div>
+    <div class="balance-box">
+      <div>💎 Баланс: <span id="balance">100</span></div>
+      <div>👥 Онлайн: <span id="online">96</span></div>
     </div>
 
     <div class="history" id="history"></div>
@@ -189,150 +124,156 @@ viewport-fit=cover"
 
     <div class="controls">
       <input type="number" id="betInput" placeholder="Ставка" />
-      <input type="number" id="autoCash" placeholder="Авто-кэшаут (2.0)" />
-      <div class="buttons">
-        <button class="bet-btn" id="betBtn">Ставка</button>
-        <button class="cash-btn" id="cashBtn">Забрать</button>
-      </div>
+      <button class="main-btn" id="mainBtn">Ставка</button>
     </div>
 
     <script>
-      const tg = window.Telegram.WebApp;
-      tg.expand();
-      tg.ready();
-
-      if (tg.themeParams.bg_color) {
-        document.documentElement.style.setProperty(
-          "--tg-bg",
-          tg.themeParams.bg_color,
-        );
-      }
-
       let balance = 100;
       let bet = 0;
       let multiplier = 1;
       let crashPoint = 0;
       let gameRunning = false;
       let history = [];
+      let playerCashOut = false;
 
-      const balanceEl = document.getElementById("balance");
-      const multiplierEl = document.getElementById("multiplier");
-      const rocketEl = document.getElementById("rocket");
-      const countdownEl = document.getElementById("countdown");
-      const historyEl = document.getElementById("history");
-      const betBtn = document.getElementById("betBtn");
-      const cashBtn = document.getElementById("cashBtn");
+      /* ONLINE */
+      function updateOnline() {
+        let online = document.getElementById("online");
+        let current = parseInt(online.innerText);
+        let change = Math.floor(Math.random() * 5) - 2;
+        current += change;
+        if (current < 60) current = 60;
+        if (current > 180) current = 180;
+        online.innerText = current;
+      }
+      setInterval(updateOnline, 2000);
 
+      /* BALANCE */
       function updateBalance() {
-        balanceEl.innerText = balance;
+        document.getElementById("balance").innerText = balance.toFixed(0);
       }
 
-      function randomCrash() {
-        return parseFloat((Math.random() * 5 + 1).toFixed(2));
-      }
-
-      function addHistory(value) {
-        history.unshift(value.toFixed(2));
-        if (history.length > 10) history.pop();
-
-        historyEl.innerHTML = "";
+      /* HISTORY */
+      function addHistory(x) {
+        history.unshift(x.toFixed(2));
+        if (history.length > 15) history.pop();
+        const h = document.getElementById("history");
+        h.innerHTML = "";
         history.forEach((v) => {
-          const span = document.createElement("span");
-          span.innerText = v + "x";
-          if (v >= 2) span.classList.add("green");
-          else if (v >= 1.2) span.classList.add("yellow");
-          else span.classList.add("red");
-          historyEl.appendChild(span);
+          const s = document.createElement("span");
+          s.innerText = v + "x";
+          if (v < 2) s.style.color = "#ef4444";
+          else if (v < 5) s.style.color = "#facc15";
+          else s.style.color = "#22c55e";
+          h.appendChild(s);
         });
       }
 
+      /* COUNTDOWN */
       function startCountdown() {
-        let count = 3;
-        countdownEl.innerText = "Старт через " + count;
-
-        const timer = setInterval(() => {
+        let count = 5;
+        const el = document.getElementById("countdown");
+        el.innerText = "🚀 Старт через " + count;
+        const t = setInterval(() => {
           count--;
-          countdownEl.innerText = "Старт через " + count;
-
-          if (count <= 0) {
-            clearInterval(timer);
-            countdownEl.innerText = "";
+          if (count > 0) {
+            el.innerText = "🚀 Старт через " + count;
+          } else {
+            clearInterval(t);
+            el.innerText = "";
             startGame();
           }
         }, 1000);
       }
 
+      /* CRASH POINT */
+      function randomCrash() {
+        return +(Math.random() * 20 + 1).toFixed(2); // всегда разный множитель
+      }
+
+      /* GAME */
       function startGame() {
         multiplier = 1;
         crashPoint = randomCrash();
         gameRunning = true;
-        betBtn.disabled = true;
+        playerCashOut = false;
+        let lastTime = performance.now();
 
-        function loop() {
+        function loop(time) {
           if (!gameRunning) return;
+          const delta = (time - lastTime) / 1000;
+          lastTime = time;
 
-          multiplier += 0.012 * multiplier;
-          multiplierEl.innerText = multiplier.toFixed(2) + "x";
-          rocketEl.style.transform = "translateY(-" + multiplier * 4 + "px)";
-
-          const auto = parseFloat(document.getElementById("autoCash").value);
-          if (bet > 0 && auto && multiplier >= auto) {
-            cashOut();
-            return;
-          }
+          multiplier *= 1 + 0.6 * delta;
+          document.getElementById("multiplier").innerText =
+            multiplier.toFixed(2) + "x";
+          document.getElementById("rocket").style.transform =
+            "translateY(" +
+            -multiplier * 4 +
+            "px) scale(" +
+            (1 + multiplier / 20) +
+            ")";
 
           if (multiplier >= crashPoint) {
             crash();
             return;
           }
-
           requestAnimationFrame(loop);
         }
-
         requestAnimationFrame(loop);
       }
 
+      /* CRASH */
       function crash() {
         gameRunning = false;
-        multiplierEl.innerText = "💥 CRASH";
-        rocketEl.style.transform = "translateY(0)";
+        document.getElementById("multiplier").innerText = "💥 CRASH";
+        document.getElementById("rocket").style.transform = "translateY(0)";
         addHistory(crashPoint);
+
         bet = 0;
-        betBtn.disabled = false;
-        setTimeout(startCountdown, 2000);
+        resetButton();
+        setTimeout(startCountdown, 3000);
       }
 
+      /* BET */
       function placeBet() {
         if (gameRunning) return;
-
         const amount = parseInt(document.getElementById("betInput").value);
-        if (!amount || amount <= 0) return tg.showAlert("Введите ставку");
-        if (amount > balance) return tg.showAlert("Недостаточно средств");
+        if (!amount || amount <= 0 || amount > balance) return;
 
         bet = amount;
         balance -= amount;
         updateBalance();
+
+        document.getElementById("mainBtn").classList.add("green");
+        document.getElementById("mainBtn").innerText = "Забрать";
       }
 
+      /* CASH OUT */
       function cashOut() {
-        if (!gameRunning || bet <= 0) return;
-
-        gameRunning = false;
+        if (!gameRunning || bet <= 0 || playerCashOut) return;
         const win = Math.floor(bet * multiplier);
         balance += win;
         updateBalance();
-
-        multiplierEl.innerText = "Забрано " + win;
-        rocketEl.style.transform = "translateY(0)";
         addHistory(multiplier);
 
-        bet = 0;
-        betBtn.disabled = false;
-        setTimeout(startCountdown, 2000);
+        playerCashOut = true; // игрок забрал, но визуализация продолжается
+        resetButton();
       }
 
-      betBtn.onclick = placeBet;
-      cashBtn.onclick = cashOut;
+      function resetButton() {
+        document.getElementById("mainBtn").classList.remove("green");
+        document.getElementById("mainBtn").innerText = "Ставка";
+      }
+
+      /* BUTTON */
+      document.getElementById("mainBtn").onclick = () => {
+        if (document.getElementById("mainBtn").classList.contains("green")) {
+          cashOut();
+        } else {
+          placeBet();
+        }
+      };
 
       updateBalance();
       startCountdown();

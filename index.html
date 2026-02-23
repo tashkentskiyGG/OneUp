@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>OneUP</title>
+
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      :root {
+        --bg: #0f172a;
+        --card: #1e293b;
+        --accent: #2563eb;
+        --green: #22c55e;
+        --red: #ef4444;
+        --yellow: #facc15;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        background: var(--bg);
+        color: white;
+        display: flex;
+        flex-direction: column;
+        height: 100dvh;
+        overflow: hidden;
+        position: relative;
+      }
+
+      /* звезды */
+      #stars {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        pointer-events: none;
+      }
+      .star {
+        position: absolute;
+        background: white;
+        border-radius: 50%;
+      }
+
+      /* статус */
+      .status-box {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 20px;
+        background: linear-gradient(135deg, #1e293b, #0f172a);
+        font-weight: 700;
+        font-size: 14px;
+        border-radius: 12px;
+        margin: 100px auto 0;
+        align-items: center;
+        max-width: 380px;
+        width: 100%;
+        z-index: 2;
+        position: relative;
+      }
+
+      /* игровая зона */
+      .game {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        z-index: 1;
+      }
+
+      #rocket {
+        position: absolute;
+        top: 60%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        transition: transform 0.05s linear;
+        display: none;
+        width: 300px;
+        height: 300px;
+        animation: rocketWobble 0.5s ease-in-out infinite alternate;
+        z-index: 2;
+      }
+      #rocket img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+
+      .countdown {
+        position: absolute;
+        font-size: clamp(80px, 15vw, 150px);
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: none;
+        z-index: 3;
+      }
+
+      #crashCoef {
+        position: absolute;
+        font-size: clamp(80px, 15vw, 150px);
+        color: red;
+        top: 60%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0);
+        display: none;
+        z-index: 4;
+        font-weight: 900;
+        transition:
+          transform 0.3s,
+          opacity 0.3s;
+        opacity: 0;
+      }
+
+      @keyframes rocketWobble {
+        0% {
+          transform: translate(-52%, -50%);
+        }
+        100% {
+          transform: translate(-48%, -50%);
+        }
+      }
+
+      /* управление */
+      .controls {
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+        z-index: 2;
+        position: relative;
+      }
+
+      #multiplier {
+        font-size: 24px;
+        font-weight: 900;
+        margin-bottom: 4px;
+      }
+
+      .history {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: 8px 0;
+      }
+      .history span {
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 12px;
+        background: var(--card);
+      }
+
+      input {
+        padding: 16px;
+        border-radius: 14px;
+        border: none;
+        background: var(--card);
+        color: white;
+        text-align: center;
+        font-size: 16px; /* минимум 16px, чтобы Safari не зумил */
+        -webkit-text-size-adjust: 100%; /* отключаем авто-зум */
+        width: 100%;
+        max-width: 300px;
+      }
+
+      .main-btn {
+        padding: 20px;
+        border: none;
+        border-radius: 16px;
+        font-weight: 900;
+        font-size: 20px;
+        background: var(--accent);
+        color: white;
+        width: 100%;
+        max-width: 380px;
+        transition: all 0.25s ease;
+      }
+      .main-btn.green {
+        background: var(--green);
+        color: black;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="stars"></div>
+
+    <div class="status-box">
+      <div>👥 Онлайн: <span id="online">96</span></div>
+      <div><span id="balance">100</span>💎</div>
+    </div>
+
+    <div class="game">
+      <div id="rocket"><img src="images/rocket.PNG" /></div>
+      <div class="countdown" id="countdown"></div>
+      <div id="crashCoef"></div>
+    </div>
+
+    <div class="controls">
+      <div class="history" id="history"></div>
+      <div id="multiplier">1.00x</div>
+      <input type="number" id="betInput" placeholder="Ставка" />
+      <button class="main-btn" id="mainBtn">Ставка</button>
+    </div>
+
+    <script>
+      let balance = 100,
+        bet = 0,
+        multiplier = 1,
+        crashPoint = 0,
+        gameRunning = false,
+        betPlaced = false,
+        historyArr = [];
+
+      /* звезды */
+      function createStars(count) {
+        const container = document.getElementById("stars");
+        for (let i = 0; i < count; i++) {
+          const star = document.createElement("div");
+          star.className = "star";
+          const size = Math.random() * 2 + 1;
+          star.style.width = size + "px";
+          star.style.height = size + "px";
+          star.style.top = Math.random() * 100 + "%";
+          star.style.left = Math.random() * 100 + "%";
+          star.style.opacity = Math.random();
+          container.appendChild(star);
+        }
+      }
+      createStars(100);
+
+      /* история */
+      function addHistory(x) {
+        historyArr.unshift(x.toFixed(2));
+        if (historyArr.length > 15) historyArr.pop();
+        const h = document.getElementById("history");
+        h.innerHTML = "";
+        historyArr.forEach((v) => {
+          const s = document.createElement("span");
+          s.innerText = v + "x";
+          s.style.color = v < 2 ? "#ef4444" : v < 5 ? "#facc15" : "#22c55e";
+          h.appendChild(s);
+        });
+      }
+
+      /* рандом крэш */
+      function randomCrash() {
+        let r = Math.random();
+        if (r < 0.3) return [1, 1.2, 1.5, 1.8][Math.floor(Math.random() * 4)];
+        if (r < 0.85) return +(Math.random() * 8 + 2).toFixed(2);
+        return [15, 20, 28][Math.floor(Math.random() * 3)];
+      }
+
+      const mainBtn = document.getElementById("mainBtn");
+
+      mainBtn.onclick = function () {
+        if (!gameRunning && !betPlaced) {
+          const input = document.getElementById("betInput");
+          bet = parseFloat(input.value);
+          if (!bet || bet <= 0 || bet > balance) return;
+
+          balance -= bet;
+          document.getElementById("balance").innerText = balance.toFixed(2);
+
+          betPlaced = true;
+          mainBtn.innerText = "Забрать";
+          mainBtn.classList.add("green");
+        } else if (gameRunning && betPlaced) {
+          const win = bet * multiplier;
+          balance += win;
+          document.getElementById("balance").innerText = balance.toFixed(2);
+
+          betPlaced = false;
+          mainBtn.innerText = "Ставка";
+          mainBtn.classList.remove("green");
+        }
+      };
+
+      function startGame() {
+        multiplier = 1;
+        crashPoint = randomCrash();
+        gameRunning = true;
+
+        document.getElementById("multiplier").innerText = "1.00x";
+        document.getElementById("rocket").style.display = "block";
+
+        let last = performance.now();
+
+        function loop(t) {
+          if (!gameRunning) return;
+
+          let delta = (t - last) / 1000;
+          last = t;
+
+          multiplier *= 1 + 0.45 * delta;
+          document.getElementById("multiplier").innerText =
+            multiplier.toFixed(2) + "x";
+
+          document.getElementById("rocket").style.transform =
+            "translate(-50%,calc(-50% - " +
+            multiplier * 6 +
+            "px)) scale(" +
+            (1 + multiplier / 25) +
+            ")";
+
+          if (multiplier >= crashPoint) {
+            crash();
+            return;
+          }
+          requestAnimationFrame(loop);
+        }
+        requestAnimationFrame(loop);
+      }
+
+      function crash() {
+        gameRunning = false;
+
+        const finalCoef = multiplier;
+        addHistory(finalCoef);
+
+        const coefEl = document.getElementById("crashCoef");
+        coefEl.innerText = finalCoef.toFixed(2) + "x";
+        coefEl.style.display = "block";
+        coefEl.style.opacity = "1";
+        coefEl.style.transform = "translate(-50%,-50%) scale(1.5)";
+
+        document.getElementById("rocket").style.display = "none";
+
+        betPlaced = false;
+        mainBtn.innerText = "Ставка";
+        mainBtn.classList.remove("green");
+
+        setTimeout(() => {
+          coefEl.style.transform = "translate(-50%,-50%) scale(0)";
+          coefEl.style.opacity = "0";
+          setTimeout(startCountdown, 300);
+        }, 1000);
+      }
+
+      function startCountdown() {
+        const el = document.getElementById("countdown");
+        document.getElementById("multiplier").innerText = "";
+        let count = 5;
+        el.style.display = "block";
+        el.innerText = count;
+        const t = setInterval(() => {
+          count--;
+          if (count > 0) el.innerText = count;
+          else {
+            clearInterval(t);
+            el.style.display = "none";
+            startGame();
+          }
+        }, 1000);
+      }
+
+      startCountdown();
+    </script>
+  </body>
+</html>

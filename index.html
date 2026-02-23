@@ -3,7 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Crash Pro X</title>
+    <title>OneUP</title>
+
     <style>
       * {
         box-sizing: border-box;
@@ -26,7 +27,27 @@
         flex-direction: column;
         height: 100dvh;
         overflow: hidden;
+        position: relative;
       }
+
+      /* ⭐ слой со звёздами */
+      #stars {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        pointer-events: none;
+        background: transparent;
+      }
+      .star {
+        position: absolute;
+        background: white;
+        border-radius: 50%;
+      }
+
+      /* верхняя панель */
       .status-box {
         display: flex;
         justify-content: space-between;
@@ -35,119 +56,73 @@
         font-weight: 700;
         font-size: 14px;
         border-radius: 12px;
-        margin: 10px auto 0;
+        margin: 50px auto 0;
         align-items: center;
         max-width: 380px;
         width: 100%;
+        z-index: 2;
+        position: relative;
       }
-      .status-item {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-      }
-      .balance-container {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-      }
-      .balance-container button {
-        background: var(--green);
-        border: none;
-        color: black;
-        font-weight: 700;
-        border-radius: 6px;
-        padding: 2px 6px;
-        cursor: pointer;
-      }
+
+      /* игровая зона */
       .game {
         flex: 1;
         display: flex;
-        flex-direction: column;
         justify-content: center;
         align-items: center;
-        gap: 10px;
         position: relative;
+        z-index: 1;
       }
-      #multiplier {
-        font-size: clamp(42px, 10vw, 72px);
-        font-weight: 900;
-      }
+
+      /* 🚀 РАКЕТА увеличенная */
       #rocket {
-        font-size: clamp(40px, 8vw, 70px);
+        position: absolute;
+        top: 60%;
+        left: 50%;
+        transform: translate(-50%, -50%);
         transition: transform 0.05s linear;
+        display: none;
+        width: 300px;
+        height: 300px;
+        animation: rocketWobble 0.5s ease-in-out infinite alternate;
+        z-index: 2;
       }
+      #rocket img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+
+      /* отсчёт */
       .countdown {
         position: absolute;
         font-size: clamp(80px, 15vw, 150px);
         color: white;
         top: 50%;
-        transform: translateY(-50%);
+        left: 50%;
+        transform: translate(-50%, -50%);
         display: none;
+        z-index: 3;
       }
-      .controls {
-        padding: 15px;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        align-items: center;
-      }
-      input {
-        padding: 16px;
-        border-radius: 14px;
-        border: none;
-        background: var(--card);
-        color: white;
-        text-align: center;
-        font-size: 18px;
-        width: 100%;
-        max-width: 300px;
-      }
-      .main-btn {
-        padding: 20px;
-        border: none;
-        border-radius: 16px;
+
+      /* большой красный кэф с анимацией */
+      #crashCoef {
+        position: absolute;
+        font-size: clamp(80px, 15vw, 150px);
+        color: red;
+        top: 60%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0);
+        display: none;
+        z-index: 4;
         font-weight: 900;
-        font-size: 20px;
-        background: var(--accent);
-        color: white;
-        width: 100%;
-        max-width: 380px;
+        transition:
+          transform 0.3s ease-out,
+          opacity 0.3s ease-out;
+        opacity: 0;
       }
-      .main-btn.green {
-        background: var(--green);
-        color: black;
-      }
-      .history {
-        display: flex;
-        gap: 6px;
-        flex-wrap: wrap;
-        justify-content: center;
-        padding: 8px 0;
-      }
-      .history span {
-        padding: 4px 8px;
-        border-radius: 6px;
-        font-size: 12px;
-        background: var(--card);
-      }
-      .bottom-buttons {
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-        margin-top: 10px;
-        width: 100%;
-        max-width: 380px;
-      }
-      .bottom-buttons button {
-        padding: 14px 20px;
-        border-radius: 12px;
-        border: none;
-        background: var(--card);
-        color: white;
-        font-weight: 700;
-        cursor: pointer;
-        flex: 1;
-      }
+
+      /* 🔥 старый взрыв */
       .explosion {
         position: absolute;
         font-size: 80px;
@@ -169,32 +144,100 @@
           opacity: 0;
         }
       }
+
+      /* покачивание ракеты */
+      @keyframes rocketWobble {
+        0% {
+          transform: translate(-52%, -50%);
+        }
+        100% {
+          transform: translate(-48%, -50%);
+        }
+      }
+
+      /* управление */
+      .controls {
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+        z-index: 2;
+        position: relative;
+      }
+
+      /* текущий кэф */
+      #multiplier {
+        font-size: 24px;
+        font-weight: 900;
+        color: white;
+        margin-bottom: 4px;
+      }
+
+      /* история */
+      .history {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: 8px 0;
+      }
+      .history span {
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 12px;
+        background: var(--card);
+      }
+
+      input {
+        padding: 16px;
+        border-radius: 14px;
+        border: none;
+        background: var(--card);
+        color: white;
+        text-align: center;
+        font-size: 18px;
+        width: 100%;
+        max-width: 300px;
+      }
+
+      .main-btn {
+        padding: 20px;
+        border: none;
+        border-radius: 16px;
+        font-weight: 900;
+        font-size: 20px;
+        background: var(--accent);
+        color: white;
+        width: 100%;
+        max-width: 380px;
+      }
+      .main-btn.green {
+        background: var(--green);
+        color: black;
+      }
     </style>
   </head>
+
   <body>
+    <div id="stars"></div>
+
     <div class="status-box">
-      <div class="status-item">👥 Онлайн: <span id="online">96</span></div>
-      <div class="status-item balance-container">
-        <span id="balance">100</span>💎
-        <button id="addBalance">+</button>
-      </div>
+      <div>👥 Онлайн: <span id="online">96</span></div>
+      <div><span id="balance">100</span>💎</div>
     </div>
 
     <div class="game">
-      <div id="multiplier">1.00x</div>
-      <div id="rocket">🚀</div>
+      <div id="rocket"><img src="images/rocket.PNG" /></div>
       <div class="countdown" id="countdown"></div>
+      <div id="crashCoef"></div>
     </div>
 
     <div class="controls">
       <div class="history" id="history"></div>
+      <div id="multiplier">1.00x</div>
       <input type="number" id="betInput" placeholder="Ставка" />
       <button class="main-btn" id="mainBtn">Ставка</button>
-      <div class="bottom-buttons">
-        <button id="btnLeft">Вывод</button>
-        <button id="btnCenter">Crash</button>
-        <button id="btnRight">Профиль</button>
-      </div>
     </div>
 
     <script>
@@ -203,22 +246,26 @@
         multiplier = 1,
         crashPoint = 0,
         gameRunning = false,
-        playerCashOut = false,
         historyArr = [];
 
-      function updateOnline() {
-        let online = document.getElementById("online");
-        let current = parseInt(online.innerText);
-        let change = Math.floor(Math.random() * 5) - 2;
-        current = Math.min(180, Math.max(60, current + change));
-        online.innerText = current;
+      // 🔹 генерация звёзд
+      function createStars(count) {
+        const container = document.getElementById("stars");
+        for (let i = 0; i < count; i++) {
+          const star = document.createElement("div");
+          star.className = "star";
+          const size = Math.random() * 2 + 1;
+          star.style.width = size + "px";
+          star.style.height = size + "px";
+          star.style.top = Math.random() * 100 + "%";
+          star.style.left = Math.random() * 100 + "%";
+          star.style.opacity = Math.random();
+          container.appendChild(star);
+        }
       }
-      setInterval(updateOnline, 2000);
+      createStars(100);
 
-      function updateBalance() {
-        document.getElementById("balance").innerText = balance.toFixed(0);
-      }
-
+      // история кэфов
       function addHistory(x) {
         historyArr.unshift(x.toFixed(2));
         if (historyArr.length > 15) historyArr.pop();
@@ -232,11 +279,91 @@
         });
       }
 
+      // случайный крэш
+      function randomCrash() {
+        let r = Math.random();
+        if (r < 0.3) return [1, 1.2, 1.5, 1.8][Math.floor(Math.random() * 4)];
+        if (r < 0.85) return +(Math.random() * 8 + 2).toFixed(2);
+        return [15, 20, 28][Math.floor(Math.random() * 3)];
+      }
+
+      // функция старта игры
+      function startGame() {
+        multiplier = 1;
+        crashPoint = randomCrash();
+        gameRunning = true;
+
+        document.getElementById("multiplier").innerText = "1.00x";
+        document.getElementById("rocket").style.display = "block";
+
+        let last = performance.now();
+
+        function loop(t) {
+          if (!gameRunning) return;
+          let delta = (t - last) / 1000;
+          last = t;
+
+          multiplier *= 1 + 0.45 * delta;
+          document.getElementById("multiplier").innerText =
+            multiplier.toFixed(2) + "x";
+
+          document.getElementById("rocket").style.transform =
+            "translate(-50%, calc(-50% - " +
+            multiplier * 6 +
+            "px)) scale(" +
+            (1 + multiplier / 25) +
+            ")";
+
+          if (multiplier >= crashPoint) {
+            crash();
+            return;
+          }
+          requestAnimationFrame(loop);
+        }
+        requestAnimationFrame(loop);
+      }
+
+      // функция взрыва
+      function createExplosion() {
+        const rocket = document.getElementById("rocket");
+        const explosion = document.createElement("div");
+        explosion.className = "explosion";
+        explosion.style.left = rocket.offsetLeft + "px";
+        explosion.style.top = rocket.offsetTop + "px";
+        explosion.innerText = "💥";
+        document.body.appendChild(explosion);
+        setTimeout(() => explosion.remove(), 600);
+      }
+
+      // функция крэша с красным кэфом и обратным отсчётом
+      function crash() {
+        gameRunning = false;
+        createExplosion();
+        addHistory(crashPoint);
+
+        const coefEl = document.getElementById("crashCoef");
+        coefEl.innerText = crashPoint.toFixed(2) + "x";
+        coefEl.style.display = "block";
+        coefEl.style.opacity = "1";
+        coefEl.style.transform = "translate(-50%,-50%) scale(1.5)";
+
+        // прячем ракету
+        document.getElementById("rocket").style.display = "none";
+
+        // плавное исчезновение красного кэфа
+        setTimeout(() => {
+          coefEl.style.transform = "translate(-50%,-50%) scale(0)";
+          coefEl.style.opacity = "0";
+          setTimeout(startCountdown, 300); // запускаем обратный отсчёт после анимации
+        }, 1000);
+      }
+
+      // 🔹 обратный отсчёт 5…4…3…1
       function startCountdown() {
+        const el = document.getElementById("countdown");
         document.getElementById("rocket").style.display = "none";
         document.getElementById("multiplier").innerText = "";
         let count = 5;
-        const el = document.getElementById("countdown");
         el.style.display = "block";
         el.innerText = count;
         const t = setInterval(() => {
@@ -250,116 +377,7 @@
         }, 1000);
       }
 
-      // Новая система коэффициентов
-      function randomCrash() {
-        let rand = Math.random();
-        if (rand < 0.3) {
-          // 30% маленькие
-          const small = [1.0, 1.2, 1.5, 1.8];
-          return small[Math.floor(Math.random() * small.length)];
-        } else if (rand < 0.85) {
-          // 55% средние
-          return +(Math.random() * 8 + 2).toFixed(2); // 2-10x
-        } else {
-          // 15% большие
-          const big = [15, 20, 28];
-          return big[Math.floor(Math.random() * big.length)];
-        }
-      }
-
-      function startGame() {
-        multiplier = 1;
-        crashPoint = randomCrash();
-        gameRunning = true;
-        playerCashOut = false;
-        document.getElementById("multiplier").innerText = "1.00x";
-        document.getElementById("rocket").style.display = "block";
-        let lastTime = performance.now();
-
-        function loop(time) {
-          if (!gameRunning) return;
-          const delta = (time - lastTime) / 1000;
-          lastTime = time;
-          multiplier *= 1 + 0.4 * delta;
-          multiplier = Math.max(multiplier, 1);
-          document.getElementById("multiplier").innerText =
-            multiplier.toFixed(2) + "x";
-          document.getElementById("rocket").style.transform =
-            "translateY(" +
-            -multiplier * 4 +
-            "px) scale(" +
-            (1 + multiplier / 20) +
-            ")";
-          if (multiplier >= crashPoint) {
-            crash();
-            return;
-          }
-          requestAnimationFrame(loop);
-        }
-        requestAnimationFrame(loop);
-      }
-
-      function createExplosion() {
-        const rocket = document.getElementById("rocket");
-        const explosion = document.createElement("div");
-        explosion.className = "explosion";
-        explosion.style.left = rocket.offsetLeft + "px";
-        explosion.style.top = rocket.offsetTop + "px";
-        explosion.innerText = "💥";
-        document.body.appendChild(explosion);
-        setTimeout(() => explosion.remove(), 600);
-      }
-
-      function crash() {
-        gameRunning = false;
-        createExplosion();
-        document.getElementById("rocket").style.display = "none";
-        document.getElementById("multiplier").innerText = "";
-        addHistory(crashPoint);
-        bet = 0;
-        resetButton();
-        setTimeout(startCountdown, 700);
-      }
-
-      function placeBet() {
-        if (gameRunning) return;
-        const amount = parseInt(document.getElementById("betInput").value);
-        if (!amount || amount <= 0 || amount > balance) return;
-        bet = amount;
-        balance -= amount;
-        updateBalance();
-        document.getElementById("mainBtn").classList.add("green");
-        document.getElementById("mainBtn").innerText = "Забрать";
-      }
-
-      function cashOut() {
-        if (!gameRunning || bet <= 0 || playerCashOut) return;
-        const win = Math.floor(bet * multiplier);
-        balance += win;
-        updateBalance();
-        addHistory(multiplier);
-        playerCashOut = true;
-        resetButton();
-      }
-
-      function resetButton() {
-        document.getElementById("mainBtn").classList.remove("green");
-        document.getElementById("mainBtn").innerText = "Ставка";
-      }
-
-      document.getElementById("mainBtn").onclick = () => {
-        if (document.getElementById("mainBtn").classList.contains("green"))
-          cashOut();
-        else placeBet();
-      };
-
-      // Пополнение баланса по кнопке +
-      document.getElementById("addBalance").onclick = () => {
-        balance += 50;
-        updateBalance();
-      };
-
-      updateBalance();
+      // стартуем первый отсчёт
       startCountdown();
     </script>
   </body>
